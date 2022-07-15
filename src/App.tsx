@@ -9,10 +9,15 @@ import {
   Route,
   Link
 } from "react-router-dom";
+import { ApolloClient, InMemoryCache, ApolloProvider, gql } from "@apollo/client";
 import { NewTransactionModal } from "./components/NewTransactionModal";
 import Insert from "./components/Insert/Insert";
 
 Modal.setAppElement('#root')
+const client = new ApolloClient({
+  uri: 'https://frontend-code-challenge-api.ze.delivery/graphql',
+  cache: new InMemoryCache(),
+});
 
 export function App() {
   const [isNewTransactionModalOpen, setIsNewTransactionModalOpen] = useState(false)
@@ -27,10 +32,12 @@ export function App() {
 
   return (
     <Router>
-      <Header
-        onOpenNewTransactionsModal={handleOpenNewTransactionModal} />
-        <Insert/>
-      <GlobalStyle />
+      <ApolloProvider client={client}>
+        <Header
+          onOpenNewTransactionsModal={handleOpenNewTransactionModal} />
+        <Insert />
+        <GlobalStyle />
+      </ApolloProvider>
     </Router>
   );
 }
