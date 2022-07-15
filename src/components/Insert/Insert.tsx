@@ -15,14 +15,18 @@ const POC_SEARCH = gql`
 `
 export default function Insert() {
     const [address, setAddress] = useState('')
-    const [pocSearchLat, setpocSearchLat] = useState('-23.6328078')
-    const [pocSearchLong, setpocSearchLong] = useState('-46.6996412')
+    //lat -23.6328029
+    //long -46.7018299
+    const [pocSearchLat, setpocSearchLat] = useState('')
+    const [pocSearchLong, setpocSearchLong] = useState('')
 
-    const { loading, error, data } = useQuery(POC_SEARCH, {
+    const { loading, error, data} = useQuery(POC_SEARCH, {
         variables: {pocSearchLong , pocSearchLat }
     })
 
     function getCoordinates(address: string) {
+        debugger;
+        address = 'R.+Américo+Brasiliense+-+Santo+Amaro,+São+Paulo'
         if (address) {
             fetch("https://maps.googleapis.com/maps/api/geocode/json?address=" + address + '&key=' + API_KEY)
                 .then(response => response.json())
@@ -36,15 +40,21 @@ export default function Insert() {
     }
 
     function inputHandler(address: string) {
-        setAddress(address)
+        
         getCoordinates(address);
-        console.log(data)
+        
+        setpocSearchLat('-23.6328029')
+        setpocSearchLong('-46.7018299')
+
+        setAddress(address)
+
     }
     if (loading) return null
     if (error) return (<div><h1>error</h1></div>);
     return (
         <div>
             <input onChange={event => inputHandler(event.target.value)} value={address} placeholder="Por favor informe endereço"></input>
+            <p>{data.pocSearch[0]?.id}</p>
         </div>
 
     )

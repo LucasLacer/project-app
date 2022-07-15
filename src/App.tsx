@@ -1,4 +1,3 @@
-import { Dashboard } from "./components/Dashboard";
 import { Header } from "./components/Header";
 import { useState } from "react";
 import { GlobalStyle } from "./styles/global";
@@ -9,6 +8,7 @@ import {
   Route,
   Link
 } from "react-router-dom";
+import ProductsPage from "./components/ProductsPage"
 import { ApolloClient, InMemoryCache, ApolloProvider, gql } from "@apollo/client";
 import { NewTransactionModal } from "./components/NewTransactionModal";
 import Insert from "./components/Insert/Insert";
@@ -20,25 +20,35 @@ const client = new ApolloClient({
 });
 
 export function App() {
-  const [isNewTransactionModalOpen, setIsNewTransactionModalOpen] = useState(false)
 
-  function handleOpenNewTransactionModal() {
-    setIsNewTransactionModalOpen(true)
-  }
-
-  function handleCloseNewTransactionModal() {
-    setIsNewTransactionModalOpen(false)
-  }
 
   return (
     <Router>
       <ApolloProvider client={client}>
-        <Header
-          onOpenNewTransactionsModal={handleOpenNewTransactionModal} />
-        <Insert />
-        <GlobalStyle />
+        <Routes>
+          <Route path="/" element={<HomePage />}>
+
+          </Route>
+          <Route path="/products" element={<ProductsPage vendorId="532"/>} />
+        </Routes>
       </ApolloProvider>
     </Router>
   );
+}
+function HomePage() {
+  const [isNewTransactionModalOpen, setIsNewTransactionModalOpen] = useState(false)
+
+  function handleCloseNewTransactionModal() {
+    setIsNewTransactionModalOpen(false)
+  }
+  function handleOpenNewTransactionModal() {
+    setIsNewTransactionModalOpen(true)
+  }
+  return (<div>
+    <Header
+      onOpenNewTransactionsModal={handleOpenNewTransactionModal} />
+    <Insert />
+    <GlobalStyle />
+  </div>)
 }
 
