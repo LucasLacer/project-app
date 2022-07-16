@@ -3,7 +3,6 @@ import { gql, useQuery } from "@apollo/client"
 interface insertInterface {
 
 }
-const API_KEY = "AIzaSyChq2Ba1MD15U9pWN4dERLlkJBO7ztQ-Vc"
 const POC_SEARCH = gql`
     query PocSearch($pocSearchLong: String!, $pocSearchLat: String!) {
     pocSearch(long: $pocSearchLong, lat: $pocSearchLat) {
@@ -28,7 +27,7 @@ export default function Insert() {
         debugger;
         address = 'R.+Américo+Brasiliense+-+Santo+Amaro,+São+Paulo'
         if (address) {
-            fetch("https://maps.googleapis.com/maps/api/geocode/json?address=" + address + '&key=' + API_KEY)
+            fetch("https://maps.googleapis.com/maps/api/geocode/json?address=" + address + '&key=' + process.env.REACT_APP_API_KEY_MAP)
                 .then(response => response.json())
                 .then(info => {
                     if (info.resutls) {

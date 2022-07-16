@@ -1,6 +1,8 @@
 import { gql, useQuery } from "@apollo/client"
 import { Header } from "../Header";
 import { GlobalStyle } from "../../styles/global";
+//import CategoryButtons from "../CatergoryButtons/CategoryButtons"
+import CategoryButtons from "../CatergoryButtons/CategoryButtons"
 interface ProductsPageProps {
   vendorId: string,
 }
@@ -9,8 +11,9 @@ interface ProductsList {
   id: string,
   title: string,
   image: string,
-  price: string
+  price: number
 }
+
 const POC = gql`
 query Poc($pocId: String!, $productsSearch: String, $productsCategoryId: String) {
     poc(id: $pocId) {
@@ -40,10 +43,12 @@ export default function ProductsPage(props: ProductsPageProps) {
     const batata = products.map((product) =>
       <div key={product.id} style={{
         backgroundColor: '#FFF', margin: '1rem', maxWidth: '200px',
-        maxHeight: '200px'
+        maxHeight: '300px'
       }}>
-        <img src={product.image} width='200px' height='200px'></img>
-        <h3>{product.title}</h3>
+        <img src={product.image} alt={product.title} width='200px' height='200px'></img>
+        <h3 style={{
+          textAlign: 'center'
+        }}>{product.title}</h3>
       </div>
     )
     return batata
@@ -52,6 +57,7 @@ export default function ProductsPage(props: ProductsPageProps) {
   return (
     <div>
       <Header />
+      <CategoryButtons />
       <div className="Products_wrapper" style={{ display: 'flex', flexWrap: 'wrap' }}>
         {/*  <div style={{ backgroundColor: '#FFF' }}>
           <img src={data.poc.products[0].image}></img>
