@@ -8,7 +8,7 @@ import {
   Route,
   Link
 } from "react-router-dom";
-import ProductsPage from "./components/ProductsPage"
+import ProductsPage from "./components/ProductsPage/ProductsPage"
 import { ApolloClient, InMemoryCache, ApolloProvider, gql } from "@apollo/client";
 import { NewTransactionModal } from "./components/NewTransactionModal";
 import Insert from "./components/Insert/Insert";
@@ -45,8 +45,7 @@ function HomePage() {
     setIsNewTransactionModalOpen(true)
   }
   return (<div>
-    <Header
-      onOpenNewTransactionsModal={handleOpenNewTransactionModal} />
+    <Header />
     <Insert />
     <GlobalStyle />
   </div>)
