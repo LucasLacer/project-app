@@ -3,7 +3,7 @@ import { Container, Content } from './Styles'
 interface HeaderProps {
     title:string
 }
-export function Header({title}:HeaderProps) {
+export default function Header({title}:HeaderProps) {
 
     return (
         <Container>

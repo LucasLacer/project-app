@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client"
-import { Header } from "../Header";
+import  Header  from "../Header/Header";
 import { GlobalStyle } from "../../styles/global";
 import CategoryButtons from "../CatergoryButtons/CategoryButtons"
 import { createContext, Dispatch, SetStateAction, useState } from "react";

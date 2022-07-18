@@ -1,6 +1,6 @@
 import { Content } from './Styles'
 
-export function Footer() {
+export default function Footer() {
 
     return (
             <Content>
