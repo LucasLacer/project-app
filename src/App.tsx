@@ -1,16 +1,16 @@
 import { Header } from "./components/Header";
-import { useState } from "react";
+import {Footer } from "./components/Footer"
 import { GlobalStyle } from "./styles/global";
 import Modal from 'react-modal'
 import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Link
+  
 } from "react-router-dom";
+
 import ProductsPage from "./components/ProductsPage/ProductsPage"
-import { ApolloClient, InMemoryCache, ApolloProvider, gql } from "@apollo/client";
-import { NewTransactionModal } from "./components/NewTransactionModal";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import Insert from "./components/Insert/Insert";
 
 Modal.setAppElement('#root')
@@ -26,28 +26,19 @@ export function App() {
     <Router>
       <ApolloProvider client={client}>
         <Routes>
-          <Route path="/" element={<HomePage />}>
-
-          </Route>
-          <Route path="/products" element={<ProductsPage vendorId="532"/>} />
+          <Route path="/" element={<HomePage />}/>
+          <Route path="/products" element={<ProductsPage />} />
         </Routes>
       </ApolloProvider>
     </Router>
   );
 }
 function HomePage() {
-  const [isNewTransactionModalOpen, setIsNewTransactionModalOpen] = useState(false)
-
-  function handleCloseNewTransactionModal() {
-    setIsNewTransactionModalOpen(false)
-  }
-  function handleOpenNewTransactionModal() {
-    setIsNewTransactionModalOpen(true)
-  }
   return (<div>
-    <Header />
+    <Header title='Home Page' />
     <Insert />
     <GlobalStyle />
+    <Footer/> 
   </div>)
 }
 

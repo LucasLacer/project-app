@@ -1,16 +1,15 @@
-import logoImg from '../../assets/logo.svg'
 import { Container, Content } from './Styles'
 
 interface HeaderProps {
- 
+    title:string
 }
-export function Header() {
+export function Header({title}:HeaderProps) {
 
     return (
         <Container>
             <Content>
                 <h1>
-                    Nova transação
+                    {title}
                 </h1>
             </Content>
         </Container>

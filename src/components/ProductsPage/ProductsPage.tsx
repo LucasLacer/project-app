@@ -1,8 +1,11 @@
 import { gql, useQuery } from "@apollo/client"
 import { Header } from "../Header";
 import { GlobalStyle } from "../../styles/global";
-//import CategoryButtons from "../CatergoryButtons/CategoryButtons"
 import CategoryButtons from "../CatergoryButtons/CategoryButtons"
+import { createContext, Dispatch, SetStateAction, useState } from "react";
+import ShoppingChart from "../ShoppingChart/ShoppingChart"
+import { useLocation } from "react-router-dom"
+import { ProductCard, AddRemove } from "./Styles"
 interface ProductsPageProps {
   vendorId: string,
 }
@@ -12,6 +15,10 @@ interface ProductsList {
   title: string,
   image: string,
   price: number
+}
+
+interface cartProducts extends ProductsList {
+  quantity: number
 }
 
 const POC = gql`
@@ -33,42 +40,95 @@ query Poc($pocId: String!, $productsSearch: String, $productsCategoryId: String)
     }
   }
 `
-export default function ProductsPage(props: ProductsPageProps) {
-  const { vendorId } = props
-  const { loading, error, data } = useQuery(POC, { variables: { pocId: vendorId } })
+interface CategoryContext {
+  passCategory: Dispatch<SetStateAction<string>>
+}
+export const categoryFunction = createContext<CategoryContext | null>(null)
+export const ProductsOnChart = createContext<Array<cartProducts> | null>(null)
+
+export default function ProductsPage() {
+  const location = useLocation()
+
+  const { vendorId } = location.state as ProductsPageProps
+  const [category, setCategory] = useState('')
+  const [productsList, setProductsList] = useState<Array<cartProducts>>([])
+
+  const { loading, error, data } = useQuery(POC, { variables: { pocId: vendorId, productsCategoryId: category } })
   console.log(data)
-  if (loading) return <h1>Is loading</h1>
-  if (error) return <h1>error</h1>
+
+  function handleCartList(product: ProductsList, action: string) {
+    let tempList = null
+    if (action === 'add') {
+      if (productsList?.length) {
+        tempList = [...productsList]
+
+        let disney = { ...product, quantity: 1 }
+        const item = tempList.find((p) => p.id === product.id)
+        if (item) {
+          const index = tempList.indexOf(item)
+          tempList[index].quantity += 1
+        } else { tempList.push?.(disney) }
+      } else {
+        tempList = [{ ...product, quantity: 1 }]
+      }
+      setProductsList?.(tempList)
+    } else {
+      tempList = [...productsList]
+
+      const item = tempList.find((p) => p.id === product.id)
+      if (item) {
+        if (item.quantity > 1) {
+          const index = tempList.indexOf(item)
+
+          tempList[index].quantity -= 1
+          setProductsList?.(tempList)
+        } else {
+          const removedItem = tempList.filter((p) => p.id !== product.id)
+          setProductsList?.(removedItem)
+        }
+      }
+    }
+
+  }
+  if (loading) return <div><Header title='Produtos' /><h1>Carregando</h1></div>
+  if (error) return <div><Header title='Produtos' /><h1>error</h1></div>
   function productsRender(products: Array<ProductsList>) {
     const batata = products.map((product) =>
-      <div key={product.id} style={{
-        backgroundColor: '#FFF', margin: '1rem', maxWidth: '200px',
-        maxHeight: '300px'
-      }}>
-        <img src={product.image} alt={product.title} width='200px' height='200px'></img>
+      <ProductCard key={product.id} >
+        <img src={product.image} alt={product.title} width='96px' height='96px'></img>
         <h3 style={{
-          textAlign: 'center'
+          textAlign: 'center',
+          fontSize: '14px'
         }}>{product.title}</h3>
-      </div>
+        <AddRemove onClick={() => handleCartList(product, 'add')}> Adicionar</AddRemove>
+        <AddRemove onClick={() => handleCartList(product, 'remove')}> Remover</AddRemove>
+      </ProductCard>
+
     )
     return batata
   }
 
   return (
-    <div>
-      <Header />
-      <CategoryButtons />
-      <div className="Products_wrapper" style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {/*  <div style={{ backgroundColor: '#FFF' }}>
-          <img src={data.poc.products[0].image}></img>
-          <h3>{data.poc.products[0].title}</h3>
+    <div className="ProductsPageWrapper">
+      <Header title='Produtos' />
+      <div className="Display" style={{ display: 'flex', flexDirection: 'row' }}>
+        <div>
+          <categoryFunction.Provider value={{ passCategory: setCategory }}>
+            <CategoryButtons />
+          </categoryFunction.Provider>
+          <div className="Products_wrapper" style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(5, auto)'
+          }}>
+            {productsRender(data.poc.products)}
+            <GlobalStyle />
+          </div>
         </div>
-        <div style={{ backgroundColor: '#FFF' }}>
-          <img src={data.poc.products[1].image}></img>
-          <h3>{data.poc.products[1].title}</h3>
-        </div> */}
-        {productsRender(data.poc.products)}
-        <GlobalStyle />
+        <div>
+          <ProductsOnChart.Provider value={productsList}>
+            <ShoppingChart />
+          </ProductsOnChart.Provider>
+        </div>
       </div>
     </div>
   )

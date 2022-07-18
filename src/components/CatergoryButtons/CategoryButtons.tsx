@@ -1,4 +1,7 @@
-import {gql, useQuery} from '@apollo/client'
+import { gql, useQuery } from '@apollo/client'
+import { useContext } from 'react'
+import { categoryFunction } from "../ProductsPage/ProductsPage"
+import { Content } from './Styles'
 const CATEGORIES = gql`
 query Categories {
   categories {
@@ -8,27 +11,30 @@ query Categories {
 }
 `
 interface CategoryList {
-    id:string,
-    title:string
+  id: string,
+  title: string
 }
-export default function CategoryButtons(){
+export default function CategoryButtons() {
+  const context = useContext(categoryFunction)
 
-    function categoryRender(categorys: Array<CategoryList>) {
-        const batata = categorys.map((category) =>
-          <div key={category.id} style={{
-            backgroundColor: '#FFF', margin: '1rem', maxWidth: '200px',
-            maxHeight: '200px'
-          }}>
-            <button>{category.title}</button>
-          </div>
-        )
-        return batata
-      }
-    const {loading, error, data} = useQuery(CATEGORIES)
-    if (loading) return <h1>Loading</h1>
-    if (error) return (<div><h1>error</h1></div>);
-    return (
-        <div style={{flexDirection: 'row',
-            display: 'flex'} }>{categoryRender(data.categories)}</div>
+  function categoryRender(categorys: Array<CategoryList>) {
+    const batata = categorys.map((category) =>
+      <Content key={category.id} >
+        <button onClick={() => { context?.passCategory(category.id) }}>{category.title}</button>
+      </Content>
     )
+    return batata
+  }
+  const { loading, error, data } = useQuery(CATEGORIES)
+  if (loading) return <h1>Loading</h1>
+  if (error) return (<div><h1>error</h1></div>);
+  return (
+    <div style={{
+      flexDirection: 'row',
+      display: 'flex'
+    }}>{categoryRender(data.categories)}
+      <Content>
+        <button onClick={() => { context?.passCategory('') }} >Limpar filtro</button></Content>
+    </div>
+  )
 }

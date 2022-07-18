@@ -1,8 +1,9 @@
-import { useEffect, useState, } from "react"
+import { useState, } from "react"
 import { gql, useQuery } from "@apollo/client"
-interface insertInterface {
+import { useNavigate } from "react-router-dom"
+import { Input } from "./Styles"
 
-}
+//Query to find distributor
 const POC_SEARCH = gql`
     query PocSearch($pocSearchLong: String!, $pocSearchLat: String!) {
     pocSearch(long: $pocSearchLong, lat: $pocSearchLat) {
@@ -12,48 +13,64 @@ const POC_SEARCH = gql`
     }
   }
 `
+
+interface coordinates {
+    latitute: string,
+    longitude: string
+}
+
+
 export default function Insert() {
+    const navigate = useNavigate();
     const [address, setAddress] = useState('')
     //lat -23.6328029
     //long -46.7018299
     const [pocSearchLat, setpocSearchLat] = useState('')
     const [pocSearchLong, setpocSearchLong] = useState('')
 
-    const { loading, error, data} = useQuery(POC_SEARCH, {
-        variables: {pocSearchLong , pocSearchLat }
+    const { loading, error, data } = useQuery(POC_SEARCH, {
+        variables: { pocSearchLong, pocSearchLat }
     })
 
-    function getCoordinates(address: string) {
-        debugger;
-        address = 'R.+Américo+Brasiliense+-+Santo+Amaro,+São+Paulo'
+    //Once the data is loaded with distruitor info go to products page
+    if (data?.pocSearch.length) {
+        navigate('./products', { state: { vendorId: data.pocSearch[0]?.id } })
+    }
+
+    async function getCoordinates(address: string) {
+        let lat
+        let long
         if (address) {
-            fetch("https://maps.googleapis.com/maps/api/geocode/json?address=" + address + '&key=' + process.env.REACT_APP_API_KEY_MAP)
-                .then(response => response.json())
-                .then(info => {
-                    if (info.resutls) {
-                        setpocSearchLat(info.results[0].geometry.location.lat)
-                        setpocSearchLong(info.results[0].geometry.location.lng)
-                    }
-                })
+            address = 'R.+Américo+Brasiliense+-+Santo+Amaro,+São+Paulo'
+            if (address) {
+                fetch("https://maps.googleapis.com/maps/api/geocode/json?address=" + address + '&key=AIzaSyChq2Ba1MD15U9pWN4dERLlkJBO7ztQ-Vc')
+                    .then(response => response.json())
+                    .then(info => {
+                        if (info.resutls) {
+                            //Problem with google API returned address if diferente from the on used on pocSearch
+                            lat = '-23.6328029'
+                            long = '-46.7018299'
+                        }
+                    })
+            }
+            return { latitude: lat, longitude: long }
         }
     }
 
-    function inputHandler(address: string) {
-        
-        getCoordinates(address);
-        
+    //Function that receives address and gets coordinates usin maps API
+    async function inputHandler(address: string) {
+
+        const orientation = await getCoordinates(address) as unknown as coordinates
         setpocSearchLat('-23.6328029')
         setpocSearchLong('-46.7018299')
 
         setAddress(address)
-
     }
-    if (loading) return null
-    if (error) return (<div><h1>error</h1></div>);
+    if (loading) return <h1>Carregando</h1>
+    if (error) return (<div><h1>Error</h1></div>);
     return (
         <div>
-            <input onChange={event => inputHandler(event.target.value)} value={address} placeholder="Por favor informe endereço"></input>
-            <p>{data.pocSearch[0]?.id}</p>
+            <Input onChange={event => inputHandler(event.target.value)} value={address} placeholder="Por favor informe seu endereço."></Input>
         </div>
 
     )
